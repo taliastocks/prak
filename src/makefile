@@ -1,5 +1,5 @@
 build:
-	$(CC) *.c -o "$(BUILDDIR)/lex"
+	$(CC) lex.c -o "$(BUILDDIR)/lex"
 
 
 .PHONY: build
