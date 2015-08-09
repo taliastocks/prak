@@ -1,4 +1,5 @@
 export BUILDDIR:=$(CURDIR)/build
+export TESTDIR:=$(CURDIR)/tests
 export SRCDIR:=$(CURDIR)/src
 
 export CC:=gcc --std=c11
@@ -13,8 +14,13 @@ publish:
 	npm publish
 
 
+test: build
+	@cd "$(TESTDIR)" && $(MAKE) test
+	@echo "Tests passed."
+
+
 clean:
 	@rm -rf "$(BUILDDIR)"
 
 
-.PHONY: build clean publish
+.PHONY: build clean publish test

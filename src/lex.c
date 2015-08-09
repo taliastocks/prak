@@ -123,7 +123,7 @@ int lex (FILE *input, FILE *output, FILE *err) {
                     next();
                     finish();
                 }
-            case '%': case '*':
+            case '%': case '*': case '!':
                 if (c == '=') {
                     token("operator");
                     out(prior);
