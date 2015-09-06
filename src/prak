@@ -1,0 +1,7 @@
+// -*- js -*-
+if (process.argv.length !== 3) {
+    console.error('Usage: prak ENTRYPOINT');
+    process.exit(1);
+}
+var prak = require('../build/prak.js');
+prak.build(process.argv[2]);

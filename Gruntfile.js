@@ -3,7 +3,7 @@ module.exports = function (grunt) {
         pkg: grunt.file.readJSON('package.json'),
         uglify: {
             options: {
-                banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+                banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */\n"use strict";'
             },
             build: {
                 files: [{
@@ -12,7 +12,16 @@ module.exports = function (grunt) {
                   src: '**/*.js',
                   dest: 'build/'
               }]
-            }
+          },
+          bin: {
+              options: {
+                  banner: '#!/usr/bin/env node\n/*! <%= pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %> */\n"use strict";'
+              },
+              files: [{
+                  src: 'src/prak',
+                  dest: 'bin/prak'
+              }]
+          }
         }
     });
 

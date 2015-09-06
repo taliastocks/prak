@@ -1,4 +1,3 @@
-exports.test = function () {
-    console.log('test');
-    require('./b.js').blah();
+exports.build = function (fname) {
+    console.log('building', fname);
 };

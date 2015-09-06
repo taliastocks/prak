@@ -1,6 +1,0 @@
-#!/usr/bin/env node
-// -*- js -*-
-'use strict';
-
-var prak = require('../build/prak.js');
-prak.test();
