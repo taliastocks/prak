@@ -22,12 +22,12 @@ module.exports = function (grunt) {
                   dest: 'bin/prak'
               }]
           }
-        }
+      },
+      clean: ['bin/', 'build/']
     });
 
-    // Load the plugin that provides the "uglify" task.
+    grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-uglify');
 
-    // Default task(s).
     grunt.registerTask('default', ['uglify']);
 };
