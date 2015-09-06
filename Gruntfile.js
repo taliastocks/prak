@@ -21,11 +21,11 @@ module.exports = function (grunt) {
               },
               files: [{
                   src: 'src/prak',
-                  dest: 'bin/prak'
+                  dest: 'build/prak'
               }]
           }
       },
-      clean: ['bin/', 'build/']
+      clean: ['build/']
     });
 
     grunt.loadNpmTasks('grunt-contrib-clean');
