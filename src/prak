@@ -9,6 +9,9 @@ var prak = require('./prak.js');
 
 prak.logger.register(function (level, message) {
     console.error(level.toUpperCase() + ':', message);
+    if (level === 'error') {
+        process.exit(1);
+    }
 });
 
 prak.build(process.argv[2]);
