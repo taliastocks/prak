@@ -1,5 +1,3 @@
-'use strict';
-
 exports.Class = (function (Object, WeakMap) {
 
     var class_info = new WeakMap;
