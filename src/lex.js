@@ -1,3 +1,0 @@
-exports.lex = function (input) {
-    
-};

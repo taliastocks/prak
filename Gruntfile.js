@@ -20,8 +20,8 @@ module.exports = function (grunt) {
                           '<%= grunt.template.today("yyyy-mm-dd") %> */\n"use strict";'
               },
               files: [{
-                  src: 'src/prak',
-                  dest: 'build/prak'
+                  src: 'src/bin-prak',
+                  dest: 'build/bin-prak'
               }]
           }
       },
