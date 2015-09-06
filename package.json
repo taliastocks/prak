@@ -1,22 +1,25 @@
 {
-  "name": "prak",
-  "version": "0.0.1",
-  "description": "test",
-  "main": "prak.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Sibilance/prak.git"
-  },
-  "author": "Collin RM Stocks",
-  "license": "GPLv3",
-  "bugs": {
-    "url": "https://github.com/Sibilance/prak/issues"
-  },
-  "homepage": "https://github.com/Sibilance/prak",
-  "bin": {
-    "prak": "bin/prak"
-  }
+    "author": "Collin RM Stocks",
+    "bin": {
+        "prak": "bin/prak"
+    },
+    "bugs": {
+        "url": "https://github.com/Sibilance/prak/issues"
+    },
+    "description": "test",
+    "devDependencies": {
+        "grunt": "~0.4.5"
+    },
+    "homepage": "https://github.com/Sibilance/prak",
+    "license": "GPLv3",
+    "main": "prak.js",
+    "name": "prak",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Sibilance/prak.git"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "version": "0.0.1"
 }
