@@ -1,17 +1,6 @@
 module.exports = function (grunt) {
     grunt.initConfig({
         clean: ['build/'],
-        jison: {
-            parser: {
-                options: {
-
-                },
-                files: [{
-                    src: 'src/grammar.jison',
-                    dest: 'generated/parser.js'
-                }]
-            }
-        },
         pkg: grunt.file.readJSON('package.json'),
         uglify: {
             build: {
@@ -48,8 +37,21 @@ module.exports = function (grunt) {
     });
 
     grunt.loadNpmTasks('grunt-contrib-clean');
-    grunt.loadNpmTasks('grunt-jison');
     grunt.loadNpmTasks('grunt-contrib-uglify');
 
-    grunt.registerTask('default', ['jison', 'uglify']);
+    grunt.registerTask('generate-grammar', function () {
+        var done = this.async();
+        require('fs').writeFile(
+            'generated/parser.js',
+            require('./tools/generate-grammar.js').output(),
+            function (err) {
+                if (err)
+                    done(false);
+                else
+                    done();
+            }
+        );
+    });
+
+    grunt.registerTask('default', ['generate-grammar', 'uglify']);
 };

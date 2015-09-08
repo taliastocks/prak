@@ -27,9 +27,7 @@
 "^="                                return '^=';
 "&="                                return '&=';
 "||"                                return '||';
-"OR"                                return '||';
 "&&"                                return '&&';
-"AND"                               return '&&';
 "|"                                 return '|';
 "^"                                 return '^';
 "&"                                 return '&';
