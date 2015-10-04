@@ -12,15 +12,12 @@ var regex_escape= function(s) {
     return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 };
 
-var used_simple_tokens = {};
 (
     ', ? = += -= *= /= %= <<= >>= &= ^= |= ' +
     '|| && | ^ & == != < <= > >= << >> + - ' +
     '* / % ++ -- ! ~ : ( ) [ ] { } => .'
 ).split(' ').forEach(function (v) {
     // Create lexer rules for each token.
-    if (used_simple_tokens[v]) return;
-    used_simple_tokens[v] = true;
     grammar.lex.rules.push([
         regex_escape(v), 'return "' + v + '";'
     ]);
