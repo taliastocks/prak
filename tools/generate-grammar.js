@@ -72,6 +72,8 @@ simple_tokens.forEach(function (v) {
 
 // Create lexer rules for literals.
 grammar.lex.rules.push(['\\s+']);
+grammar.lex.rules.push(['"/*"(.|\\n|\\r)*?"*/"']);
+grammar.lex.rules.push(['"//".*']);
 grammar.lex.rules.push(['\\"(\\\\.|[^\\\\"])*\\"', 'return "STRING";']);
 grammar.lex.rules.push(["\\'(\\\\.|[^\\\\'])*\\'", 'return "STRING";']);
 grammar.lex.rules.push(['[0-9]+("."[0-9]*)?([eE][0-9]+)?\\b', 'return "NUMBER";']);
