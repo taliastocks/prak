@@ -113,6 +113,9 @@ grammar.bnf.expr_14.push([
     'expr_13 "?" expr_14 ":" expr_14', '$$ = { ternary: [$1, $3, $5] };'
 ]);
 binary_expr(15, ',');
+grammar.bnf.expr_15.push([
+    'expr_15 ","', '$$ = { trailing_comma: $1 };'
+]);
 grammar.bnf.expression = [
     ['expr_15', '$$ = $1;']
 ];
