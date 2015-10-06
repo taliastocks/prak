@@ -1,11 +1,16 @@
 var static_assert = {:condition:
-
+    return {:message:
+        // `static_abort` is provided by the compiler.
+        condition || static_abort message;
+    };
 };
 
 var call = {:callback:
     // Why? Because fuck parentheses.
     return callback();
 };
+
+var void = call {};
 
 var if = {:condition:
     // "return" is a local variable. It is a special function that does not return.
@@ -16,11 +21,14 @@ var if = {:condition:
         condition && call body;
         return {:hopefully_else:
             // If this is called, it better be passed `else`.
-
+            static_assert (hopefully_else == else) 'expected else or end of statement';
+            return {:if_or_body:
+                // The following is evaluated statically, so the compiler doesn't care
+                // that the return types don't match.
+                if_or_body == if ? return if : call if_or_body;
+            };
         };
     };
 };
 
-var else = { func: code:
-
-};
+var else = {};

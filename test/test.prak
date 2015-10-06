@@ -4,12 +4,14 @@
 
 "\"Hello world.\"";
 
-var fib = {func :n:
-    if n == 0 {
+var fib = {func:n:
+    if (n == 0) {
         func.return 0;
-    } else if n == 1 {
+    } else if (n == 1) {
         func.return 1;
     } else {
-
-    }
+        func.return(fib(n - 1) + fib(n - 2))
+    };
 };
+
+fib 5;
