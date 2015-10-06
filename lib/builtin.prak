@@ -1,3 +1,7 @@
+var static_assert = {:condition:
+
+};
+
 var call = {:callback:
     // Why? Because fuck parentheses.
     return callback();
@@ -10,8 +14,8 @@ var if = {:condition:
         // `call body`, the compiler doesn't care because the value is never used.
         // Type checking occurs later, when values are used and types conflict.
         condition && call body;
-        // 
-        return {:maybe_else:
+        return {:hopefully_else:
+            // If this is called, it better be passed `else`.
 
         };
     };

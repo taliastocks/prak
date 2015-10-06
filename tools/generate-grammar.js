@@ -66,17 +66,17 @@ var binary_expr = function (level, operators, assoc) {
     });
 };
 
-grammar.bnf.expr_0 = [
+grammar.bnf.expr_1 = [
     ['STRING', '$$ = { string: yytext };'],
     ['NUMBER', '$$ = { number: yytext };'],
     ['identifier', '$$ = $1;'],
-    ['"{" ":" optional_arguments ":" statements "}"', '$$ = { lambda: [$3, $5] };'],
-    ['"{" identifier ":" optional_arguments ":" statements "}"', '$$ = { lambda: [$3, $5] };'],
-    ['"{" statements "}"', '$$ = { lambda: [{ arguments: [] }, $2] };']
-];
-grammar.bnf.expr_1 = [ // Unambiguous expressions.
-    ['expr_0', '$$ = $1;'],
-    ['"(" expression ")"', '$$ = $2;']
+    ['"{" ":" ":" statements "}"', '$$ = { lambda: [{}, {}, $4] };'],
+    ['"{" ":" identifier ":" statements "}"', '$$ = { lambda: [{}, $3, $5] };'],
+    ['"{" identifier ":" ":" statements "}"', '$$ = { lambda: [$2, {}, $5] };'],
+    ['"{" identifier ":" identifier ":" statements "}"', '$$ = { lambda: [$2, $4, $6] };'],
+    ['"{" identifier ":" "(" arguments ")" ":" statements "}"', '$$ = { lambda: [$2, $5, $8] };'],
+    ['"{" statements "}"', '$$ = { lambda: [{ arguments: [] }, $2] };'],
+    ['"(" expression ")"', '$$ = { parens: $2 };']
 ];
 grammar.bnf.expr_2 = [ // Prefix operators.
     ['expr_1', '$$ = $1;']
@@ -88,10 +88,9 @@ grammar.bnf.expr_2 = [ // Prefix operators.
 });
 grammar.bnf.expr_3 = [ // Suffix operators.
     ['expr_2', '$$ = $1;'],
-    ['expr_3 expr_0', '$$ = { call: [$1, { expression_list: [$2] }] };'],
+    ['expr_3 expr_1', '$$ = { call: [$1, { expression_list: [$2] }] };'],
     ['expr_3 "(" ")"', '$$ = { call: [$1, { expression_list: [] }] };'],
-    ['expr_3 "(" expression_list ")"', '$$ = { call: [$1, $3] };'],
-    ['expr_3 "[" expression_list "]"', '$$ = { index: [$1, $3] };'],
+    ['expr_3 "[" expression "]"', '$$ = { index: [$1, $3] };'],
     ['expr_3 "." identifier', '$$ = { member: [$1, $3] };']
 ];
 '++ --'.split(' ').forEach(function (v) {
@@ -120,10 +119,6 @@ grammar.bnf.expression = [
 grammar.bnf.expression_list = [
     ['expr_14', '$$ = { expression_list: [$1] };'],
     ['expression_list "," expr_14', '$$ = $1; $$.expression_list.push($3);']
-];
-grammar.bnf.optional_arguments = [
-    ['arguments', '$$ = $1;'],
-    ['', '$$ = { arguments: [] };']
 ];
 grammar.bnf.arguments = [
     ['identifier', '$$ = { arguments: [$1] };'],
