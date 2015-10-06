@@ -15,11 +15,12 @@ var regex_escape= function(s) {
 (
     ', ? = += -= *= /= %= <<= >>= &= ^= |= ' +
     '|| && | ^ & == != < <= > >= << >> + - ' +
-    '* / % ++ -- ! ~ : ( ) [ ] { } => .'
+    '* / % ++ -- ! ~ : ( ) [ ] { } . ' +
+    'var'
 ).split(' ').forEach(function (v) {
     // Create lexer rules for each token.
     grammar.lex.rules.push([
-        regex_escape(v), 'return "' + v + '";'
+        regex_escape(v), 'return ' + JSON.stringify(v) + ';'
     ]);
 });
 
@@ -65,13 +66,17 @@ var binary_expr = function (level, operators, assoc) {
     });
 };
 
-grammar.bnf.expr_1 = [ // Unambiguous expressions.
-    ['"(" expression ")"', '$$ = $1;'],
+grammar.bnf.expr_0 = [
     ['STRING', '$$ = { string: yytext };'],
     ['NUMBER', '$$ = { number: yytext };'],
-    ['IDENTIFIER', '$$ = { identifier: yytext };'],
-    ['"{" "=>" arguments ";" statements "}"', '$$ = { lambda: [$3, $5] };'],
-    ['"{" statements "}"', '$$ = { lambda: [{ arguments: [] }, $2] };'],
+    ['identifier', '$$ = $1;'],
+    ['"{" ":" optional_arguments ":" statements "}"', '$$ = { lambda: [$3, $5] };'],
+    ['"{" identifier ":" optional_arguments ":" statements "}"', '$$ = { lambda: [$3, $5] };'],
+    ['"{" statements "}"', '$$ = { lambda: [{ arguments: [] }, $2] };']
+];
+grammar.bnf.expr_1 = [ // Unambiguous expressions.
+    ['expr_0', '$$ = $1;'],
+    ['"(" expression ")"', '$$ = $2;']
 ];
 grammar.bnf.expr_2 = [ // Prefix operators.
     ['expr_1', '$$ = $1;']
@@ -83,9 +88,10 @@ grammar.bnf.expr_2 = [ // Prefix operators.
 });
 grammar.bnf.expr_3 = [ // Suffix operators.
     ['expr_2', '$$ = $1;'],
-    ['expr_3 "(" ")"', '$$ = { call: [$1, { expressions: [] }] };'],
-    ['expr_3 "(" expressions ")"', '$$ = { call: [$1, $3] };'],
-    ['expr_3 "[" expressions "]"', '$$ = { index: [$1, $3] };'],
+    ['expr_3 expr_0', '$$ = { call: [$1, { expression_list: [$2] }] };'],
+    ['expr_3 "(" ")"', '$$ = { call: [$1, { expression_list: [] }] };'],
+    ['expr_3 "(" expression_list ")"', '$$ = { call: [$1, $3] };'],
+    ['expr_3 "[" expression_list "]"', '$$ = { index: [$1, $3] };'],
     ['expr_3 "." identifier', '$$ = { member: [$1, $3] };']
 ];
 '++ --'.split(' ').forEach(function (v) {
@@ -111,9 +117,13 @@ binary_expr(15, ',');
 grammar.bnf.expression = [
     ['expr_15', '$$ = $1;']
 ];
-grammar.bnf.expressions = [
-    ['expr_14', '$$ = { expressions: [$1] };'],
-    ['expressions "," expr_14', '$$ = $1; $$.expressions.push($3);']
+grammar.bnf.expression_list = [
+    ['expr_14', '$$ = { expression_list: [$1] };'],
+    ['expression_list "," expr_14', '$$ = $1; $$.expression_list.push($3);']
+];
+grammar.bnf.optional_arguments = [
+    ['arguments', '$$ = $1;'],
+    ['', '$$ = { arguments: [] };']
 ];
 grammar.bnf.arguments = [
     ['identifier', '$$ = { arguments: [$1] };'],

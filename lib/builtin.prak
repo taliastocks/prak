@@ -1,0 +1,22 @@
+var call = {:callback:
+    // Why? Because fuck parentheses.
+    return callback();
+};
+
+var if = {:condition:
+    // "return" is a local variable. It is a special function that does not return.
+    return {:body:
+        // Even though `condition` may be a different type than the return value of
+        // `call body`, the compiler doesn't care because the value is never used.
+        // Type checking occurs later, when values are used and types conflict.
+        condition && call body;
+        // 
+        return {:maybe_else:
+
+        };
+    };
+};
+
+var else = { func: code:
+
+};

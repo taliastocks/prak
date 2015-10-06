@@ -3,3 +3,13 @@
 */
 
 "\"Hello world.\"";
+
+var fib = {func :n:
+    if n == 0 {
+        func.return 0;
+    } else if n == 1 {
+        func.return 1;
+    } else {
+
+    }
+};
