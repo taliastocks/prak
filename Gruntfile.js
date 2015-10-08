@@ -1,6 +1,9 @@
 module.exports = function (grunt) {
+    grunt.file.mkdir('build/');
+    grunt.file.mkdir('generated/');
+
     grunt.initConfig({
-        clean: ['build/'],
+        clean: ['build/', 'generated/'],
         pkg: grunt.file.readJSON('package.json'),
         uglify: {
             build: {
