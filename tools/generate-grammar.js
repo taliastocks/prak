@@ -16,7 +16,7 @@ var regex_escape= function(s) {
     ', ? = += -= *= /= %= <<= >>= &= ^= |= ' +
     '|| && | ^ & == != < <= > >= << >> + - ' +
     '* / % ++ -- ! ~ : ( ) [ ] { } . ' +
-    'var'
+    'break continue do for if return var while'
 ).split(' ').forEach(function (v) {
     // Create lexer rules for each token.
     grammar.lex.rules.push([
@@ -41,13 +41,17 @@ grammar.bnf.start = [
     ['statements EOF', 'return $1;']
 ];
 grammar.bnf.statements = [
-    ['statement', '$$ = { statements: [$1] };'],
-    ['statements statement', '$$ = $1; $$.statements.push($2);']
+    ['', '$$ = ["statements", []];'],
+    ['statements statement', '$$ = $1; $$[1].push($2);']
 ];
 grammar.bnf.statement = [
-    ['expression ";"', '$$ = $1;']
+    ['"{" statements "}"', '$$ = $2;'],
+    ['expression ";"', '$$ = $1;'],
+    ['"return" ";"', '$$ = ["return", ["void"]];'],
+    ['"return" expression ";"', '$$ = ["return", $2];']
 ];
-grammar.bnf.identifier = [['IDENTIFIER', '$$ = { identifier: yytext };']];
+
+grammar.bnf.identifier = [['IDENTIFIER', '$$ = ["identifier", yytext];']];
 
 var binary_expr = function (level, operators, assoc) {
     assoc = assoc || 'left';
@@ -61,41 +65,37 @@ var binary_expr = function (level, operators, assoc) {
     operators.split(' ').forEach(function (v) {
         grammar.bnf['expr_' + level].push([
             'expr_' + left + ' "' + v + '" expr_' + right,
-            '$$ = { binary: ["' + v + '", $1, $3] }'
+            '$$ = ["binary", ["' + v + '", $1, $3]]'
         ]);
     });
 };
 
 grammar.bnf.expr_1 = [
-    ['STRING', '$$ = { string: yytext };'],
-    ['NUMBER', '$$ = { number: yytext };'],
+    ['STRING', '$$ = ["string", yytext];'],
+    ['NUMBER', '$$ = ["number", yytext];'],
     ['identifier', '$$ = $1;'],
-    ['"{" ":" ":" statements "}"', '$$ = { lambda: [{}, {}, $4] };'],
-    ['"{" ":" identifier ":" statements "}"', '$$ = { lambda: [{}, $3, $5] };'],
-    ['"{" identifier ":" ":" statements "}"', '$$ = { lambda: [$2, {}, $5] };'],
-    ['"{" identifier ":" identifier ":" statements "}"', '$$ = { lambda: [$2, $4, $6] };'],
-    ['"{" identifier ":" "(" arguments ")" ":" statements "}"', '$$ = { lambda: [$2, $5, $8] };'],
-    ['"{" statements "}"', '$$ = { lambda: [{ arguments: [] }, $2] };'],
-    ['"(" expression ")"', '$$ = { parens: $2 };']
+    ['"{" ":" ":" statements "}"', '$$ = ["function", [["arguments", []], $4]];'],
+    ['"{" ":" arguments ":" statements "}"', '$$ = ["function", [$3, $5]];'],
+    ['"(" expression ")"', '$$ = $2;']
 ];
 grammar.bnf.expr_2 = [ // Prefix operators.
     ['expr_1', '$$ = $1;']
 ];
 '++ -- + - ! ~'.split(' ').forEach(function (v) {
     grammar.bnf.expr_2.push([
-        '"' + v + '" expr_2', '$$ = { prefix: [$1, $2] };'
+        '"' + v + '" expr_2', '$$ = ["prefix", [$1, $2]];'
     ]);
 });
 grammar.bnf.expr_3 = [ // Suffix operators.
     ['expr_2', '$$ = $1;'],
-    ['expr_3 expr_1', '$$ = { call: [$1, { expression_list: [$2] }] };'],
-    ['expr_3 "(" ")"', '$$ = { call: [$1, { expression_list: [] }] };'],
-    ['expr_3 "[" expression "]"', '$$ = { index: [$1, $3] };'],
-    ['expr_3 "." identifier', '$$ = { member: [$1, $3] };']
+    ['expr_3 expr_1', '$$ = ["call", [$1, $2]];'],
+    ['expr_3 "(" ")"', '$$ = ["call", [$1]];'],
+    ['expr_3 "[" expression "]"', '$$ = ["index", [$1, $3]];'],
+    ['expr_3 "." identifier', '$$ = ["member", [$1, $3]];']
 ];
 '++ --'.split(' ').forEach(function (v) {
     grammar.bnf.expr_3.push([
-        'expr_3 "' + v + '"', '$$ = { prefix: [$2, $1] };'
+        'expr_3 "' + v + '"', '$$ = ["suffix", [$2, $1]];'
     ]);
 });
 binary_expr(4, '* / %');
@@ -110,22 +110,15 @@ binary_expr(12, '&&');
 binary_expr(13, '||');
 binary_expr(14, '= += -= *= /= %= <<= >>= &= ^= |=', 'right');
 grammar.bnf.expr_14.push([
-    'expr_13 "?" expr_14 ":" expr_14', '$$ = { ternary: [$1, $3, $5] };'
+    'expr_13 "?" expr_14 ":" expr_14', '$$ = ["ternary", [$1, $3, $5]];'
 ]);
 binary_expr(15, ',');
-grammar.bnf.expr_15.push([
-    'expr_15 ","', '$$ = { trailing_comma: $1 };'
-]);
 grammar.bnf.expression = [
     ['expr_15', '$$ = $1;']
 ];
-grammar.bnf.expression_list = [
-    ['expr_14', '$$ = { expression_list: [$1] };'],
-    ['expression_list "," expr_14', '$$ = $1; $$.expression_list.push($3);']
-];
 grammar.bnf.arguments = [
-    ['identifier', '$$ = { arguments: [$1] };'],
-    ['arguments "," identifier', '$$ = $1; $$.arguments.push($3);']
+    ['identifier', '$$ = ["arguments", [$1]];'],
+    ['arguments "," identifier', '$$ = $1; $$[1].push($3);']
 ];
 
 exports.output = function () {
