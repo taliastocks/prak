@@ -1,7 +1,4 @@
 module.exports = function (grunt) {
-    grunt.file.mkdir('build/');
-    grunt.file.mkdir('generated/');
-
     grunt.initConfig({
         clean: ['build/', 'generated/'],
         pkg: grunt.file.readJSON('package.json'),
@@ -56,5 +53,10 @@ module.exports = function (grunt) {
         );
     });
 
-    grunt.registerTask('default', ['generate-grammar', 'uglify']);
+    grunt.registerTask('create-directories', function () {
+        grunt.file.mkdir('build/');
+        grunt.file.mkdir('generated/');
+    });
+
+    grunt.registerTask('default', ['create-directories', 'generate-grammar', 'uglify']);
 };
