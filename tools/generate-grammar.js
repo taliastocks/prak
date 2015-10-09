@@ -45,23 +45,31 @@ grammar.bnf.statements = [
     ['', '$$ = ["statements", []];'],
     ['statements statement', '$$ = $1; $$[1].push($2);']
 ];
+grammar.bnf.statement = [
+    ['statement_1', '$$ = $1;'],
+    ['if_statement', '$$ = $1;']
+];
+grammar.bnf.if_statement = [
+    ['"if" expr_1 stmt_matched if_optional_tail', '$$ = ["if", [$2, $3, $4]];']
+];
 grammar.bnf.statement_1 = [
     ['"{" statements "}"', '$$ = $2;'],
     ['expression ";"', '$$ = $1;'],
     ['"return" ";"', '$$ = ["return", ["void"]];'],
     ['"return" expression ";"', '$$ = ["return", $2];'],
-    ['"while" expr_1 statement', '$$ = ["while", [$2, $3]];']
+    ['"while" expr_1 "{" statement "}"', '$$ = ["while", [$2, $4]];']
 ];
-grammar.bnf.statement_2 = [
+grammar.bnf.stmt_matched = [
     ['statement_1', '$$ = $1;'],
-    ['"if" expr_1 statement_2 "else" statement_3', '$$ = ["if", [$2, $3, $5]];']
+    ['"if" expr_1 stmt_matched "else" stmt_matched', '$$ = ["if", [$2, $3, $5]];']
 ];
-grammar.bnf.statement_3 = [
-    ['statement_2', '$$ = $1;'],
-    ['"if" expr_1 statement_3', '$$ = ["if", [$2, $3]];']
+grammar.bnf.if_optional_tail = [
+    ['', '$$ = null;'],
+    ['"else" if_tail', '$$ = $2;']
 ];
-grammar.bnf.statement = [
-    ['statement_3', '$$ = $1;']
+grammar.bnf.if_tail = [
+    ['"if" expr_1 if_tail', '$$ = ["if", [$2, $3, null]];'],
+    ['statement_1', '$$ = $1;']
 ];
 
 grammar.bnf.identifier = [['IDENTIFIER', '$$ = ["identifier", yytext];']];
