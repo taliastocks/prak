@@ -16,7 +16,7 @@ var regex_escape= function(s) {
     ', ? = += -= *= /= %= <<= >>= &= ^= |= ' +
     '|| && | ^ & == != < <= > >= << >> + - ' +
     '* / % ++ -- ! ~ : ( ) [ ] { } . ' +
-    'break call continue do else for if return var while'
+    'break call continue do else for if return var void while'
 ).split(' ').forEach(function (v) {
     // Create lexer rules for each token.
     grammar.lex.rules.push([
@@ -45,11 +45,23 @@ grammar.bnf.statements = [
     ['', '$$ = ["statements", []];'],
     ['statements statement', '$$ = $1; $$[1].push($2);']
 ];
-grammar.bnf.statement = [
+grammar.bnf.statement_1 = [
     ['"{" statements "}"', '$$ = $2;'],
     ['expression ";"', '$$ = $1;'],
     ['"return" ";"', '$$ = ["return", ["void"]];'],
-    ['"return" expression ";"', '$$ = ["return", $2];']
+    ['"return" expression ";"', '$$ = ["return", $2];'],
+    ['"while" expr_1 statement', '$$ = ["while", [$2, $3]];']
+];
+grammar.bnf.statement_2 = [
+    ['statement_1', '$$ = $1;'],
+    ['"if" expr_1 statement_2 "else" statement_3', '$$ = ["if", [$2, $3, $5]];']
+];
+grammar.bnf.statement_3 = [
+    ['statement_2', '$$ = $1;'],
+    ['"if" expr_1 statement_3', '$$ = ["if", [$2, $3]];']
+];
+grammar.bnf.statement = [
+    ['statement_3', '$$ = $1;']
 ];
 
 grammar.bnf.identifier = [['IDENTIFIER', '$$ = ["identifier", yytext];']];
@@ -74,6 +86,7 @@ var binary_expr = function (level, operators, assoc) {
 grammar.bnf.expr_1 = [
     ['STRING', '$$ = ["string", yytext];'],
     ['NUMBER', '$$ = ["number", yytext];'],
+    ['"void"', '$$ = ["void"];'],
     ['identifier', '$$ = $1;'],
     ['"{" ":" ":" statements "}"', '$$ = ["function", [["arguments", []], $4]];'],
     ['"{" ":" arguments ":" statements "}"', '$$ = ["function", [$3, $5]];'],
@@ -90,7 +103,7 @@ grammar.bnf.expr_2 = [ // Prefix operators.
 grammar.bnf.expr_3 = [ // Suffix operators.
     ['expr_2', '$$ = $1;'],
     ['expr_3 expr_1', '$$ = ["call", [$1, $2]];'],
-    ['"call" expr_3 ', '$$ = ["call", [$2]];'],
+    ['"call" expr_1 ', '$$ = ["call", [$2]];'],
     ['expr_3 "[" expression "]"', '$$ = ["index", [$1, $3]];'],
     ['expr_3 "." identifier', '$$ = ["member", [$1, $3]];']
 ];
