@@ -45,6 +45,9 @@ grammar.bnf.statements = [
     ['', '$$ = ["statements", []];'],
     ['statements statement', '$$ = $1; $$[1].push($2);']
 ];
+// Credit for the closed_statement/open_statement solution to the
+// dangling else problem goes to Parsifal Software.
+// http://www.parsifalsoft.com/ifelse.html
 grammar.bnf.statement = [
     ['closed_statement', '$$ = $1;'],
     ['open_statement', '$$ = $1;']
