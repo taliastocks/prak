@@ -46,30 +46,29 @@ grammar.bnf.statements = [
     ['statements statement', '$$ = $1; $$[1].push($2);']
 ];
 grammar.bnf.statement = [
-    ['statement_1', '$$ = $1;'],
-    ['if_statement', '$$ = $1;']
+    ['closed_statement', '$$ = $1;'],
+    ['open_statement', '$$ = $1;']
 ];
-grammar.bnf.if_statement = [
-    ['"if" expr_1 stmt_matched if_optional_tail', '$$ = ["if", [$2, $3, $4]];']
+grammar.bnf.if_clause = [
+    ['"if" expr_1', '$$ = $2;']
 ];
-grammar.bnf.statement_1 = [
+grammar.bnf.loop_header = [
+    ['"while" expr_1', '$$ = ["while", [$2]];'],
+    // TODO: var in for loop
+    ['"for" "(" expression ";" expression ";" expression ")"', '$$ = ["for", [$3, $5, $7]];']
+];
+grammar.bnf.open_statement = [
+    ['if_clause statement', '$$ = ["if", [$1, $2]];'],
+    ['if_clause closed_statement "else" open_statement', '$$ = ["if_else", [$1, $2, $4]];'],
+    ['loop_header open_statement', '$$ = $1; $$[1].push($2);']
+];
+grammar.bnf.closed_statement = [
+    // TODO: var
     ['"{" statements "}"', '$$ = $2;'],
     ['expression ";"', '$$ = $1;'],
     ['"return" ";"', '$$ = ["return", ["void"]];'],
     ['"return" expression ";"', '$$ = ["return", $2];'],
-    ['"while" expr_1 "{" statement "}"', '$$ = ["while", [$2, $4]];']
-];
-grammar.bnf.stmt_matched = [
-    ['statement_1', '$$ = $1;'],
-    ['"if" expr_1 stmt_matched "else" stmt_matched', '$$ = ["if", [$2, $3, $5]];']
-];
-grammar.bnf.if_optional_tail = [
-    ['', '$$ = null;'],
-    ['"else" if_tail', '$$ = $2;']
-];
-grammar.bnf.if_tail = [
-    ['"if" expr_1 if_tail', '$$ = ["if", [$2, $3, null]];'],
-    ['statement_1', '$$ = $1;']
+    ['loop_header closed_statement', '$$ = $1; $$[1].push($2);']
 ];
 
 grammar.bnf.identifier = [['IDENTIFIER', '$$ = ["identifier", yytext];']];
