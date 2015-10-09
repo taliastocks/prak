@@ -16,7 +16,7 @@ var regex_escape= function(s) {
     ', ? = += -= *= /= %= <<= >>= &= ^= |= ' +
     '|| && | ^ & == != < <= > >= << >> + - ' +
     '* / % ++ -- ! ~ : ( ) [ ] { } . ' +
-    'break continue do for if return var while'
+    'break call continue do else for if return var while'
 ).split(' ').forEach(function (v) {
     // Create lexer rules for each token.
     grammar.lex.rules.push([
@@ -24,7 +24,7 @@ var regex_escape= function(s) {
     ]);
 });
 
-// Create lexer rules for literals.
+// Create lexer rules for literals, whitespace and comments.
 grammar.lex.rules.push(['\\s+', '/* skip whitespace */']);
 grammar.lex.rules.push(['\\/\\*(.|\\n|\\r)*?\\*\\/', '/* multi-line comment */']);
 grammar.lex.rules.push(['\\/\\/.*', '/* line comment */']);
@@ -36,6 +36,7 @@ grammar.lex.rules.push(['0x[0-9A-Fa-f]+\\b', 'return "NUMBER";']);
 grammar.lex.rules.push(['[A-Za-z_][0-9A-Za-z_]*', 'return "IDENTIFIER";']);
 grammar.lex.rules.push(['$', 'return "EOF";']);
 
+// Begin grammar.
 grammar.start = 'start';
 grammar.bnf.start = [
     ['statements EOF', 'return $1;']
@@ -89,7 +90,7 @@ grammar.bnf.expr_2 = [ // Prefix operators.
 grammar.bnf.expr_3 = [ // Suffix operators.
     ['expr_2', '$$ = $1;'],
     ['expr_3 expr_1', '$$ = ["call", [$1, $2]];'],
-    ['expr_3 "(" ")"', '$$ = ["call", [$1]];'],
+    ['"call" expr_3 ', '$$ = ["call", [$2]];'],
     ['expr_3 "[" expression "]"', '$$ = ["index", [$1, $3]];'],
     ['expr_3 "." identifier', '$$ = ["member", [$1, $3]];']
 ];
